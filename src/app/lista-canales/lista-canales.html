@@ -1,0 +1,11 @@
+<div class="container-fluid d-flex justify-content-center align-items-center">
+  <div class="text-center">
+    
+    <button class="btn btn-primary btn-lg mx-2 mb-3 big-btn" (click)="enviarCanal('CartoonNetwork')">CartoonNetwork</button>
+    <button class="btn btn-warning btn-lg mx-2 mb-3 big-btn" (click)="enviarCanal('Nickelodeon')">Nickelodeon</button>
+    <button class="btn btn-info btn-lg mx-2 mb-3 big-btn" (click)="enviarCanal('Disney')">Disney</button>
+    <button class="btn btn-danger btn-lg mx-2 mb-3 big-btn" (click)="enviarCanal('Jetix')">Jetix</button>
+  </div>
+</div>
+
+<app-dibujar-api [scheduleByDay]="channelType()"></app-dibujar-api>

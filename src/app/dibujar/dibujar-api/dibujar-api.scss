@@ -1,0 +1,103 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.schedule-container {
+  height: 100vh; /* full height of viewport */
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 8px;
+}
+
+.schedule-table {
+  font-size: 0.85rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+/* Time column sticky */
+.time-col {
+  background-color: #f1f3f5;
+  font-weight: bold;
+  min-width: 70px;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+/* Header sticky */
+.schedule-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+/* Active row highlight */
+.active-row {
+  background: yellow;
+  transition: background-color 0.3s ease;
+}
+
+/* Clickable show badges */
+.clickable-show {
+  cursor: pointer;
+  display: inline-block;
+  margin: 2px 2px 2px 0;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #fff;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.clickable-show:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+/* Channel colors */
+.cartoonnetwork { background-color: #00bfff; }
+.jetix { background-color: #ff4500; }
+.disney { background-color: #1e90ff; }
+.nickelodeon { background-color: #ff8c00; }
+
+/* Table layout adjustments */
+.schedule-table tbody {
+  display: block;
+  max-height: calc(100vh - 50px); /* adjust for header */
+  overflow-y: auto;
+}
+
+.schedule-table thead, .schedule-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.schedule-table th, .schedule-table td {
+  vertical-align: middle;
+  padding: 6px;
+}
+/* Ensure the active row is visible */
+.active-row {
+  background-color: #ffeb99 !important; /* bright yellow */
+}
+.active-row-badges{
+    background: skyblue;
+}
+.live-badge {
+  background-color: #ff4d4d;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
