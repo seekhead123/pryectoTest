@@ -705,4 +705,24 @@ getChannelClass(show: string): string {
       this.activeRowElement = el;
     }
   }
+// returns row class name used above
+getRowClass(): string {
+  switch (this.scheduleByDay()) {
+    case 'CartoonNetwork': return 'active-row-cn';
+    case 'Jetix': return 'active-row-jetix';
+    case 'Nickelodeon': return 'active-row-nick';
+    case 'Disney': return 'active-row-disney';
+    default: return 'active-row-cn';
+  }
+}
+
+getBadgeClass(): string {
+  switch (this.scheduleByDay()) {
+    case 'CartoonNetwork': return 'badge-cn';
+    case 'Jetix': return 'badge-jetix';
+    case 'Nickelodeon': return 'badge-nick';
+    case 'Disney': return 'badge-disney';
+    default: return 'badge-cn';
+  }
+}
 }

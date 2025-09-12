@@ -9,9 +9,9 @@
     <tbody>
  <tr *ngFor="let time of timeSlots">
   <td [ngClass]="{'active-row': isActive(time)}">
-    <strong>{{ time }}</strong>
-    <span *ngIf="isActive(time)" class="live-badge">* emitiendo ahora</span>
-  </td>
+  <strong>{{ time }}</strong>
+  <span *ngIf="isActive(time)" class="live-badge">* emitiendo ahora</span>
+</td>
   <td *ngFor="let day of days" [ngClass]="{'active-row': isActive(time)}">
     <ng-container *ngIf="cartoonScheduleByDay[day][time]?.length; else noShow">
       <span [ngClass]="{'active-row-badges': isActive(time)}" class="clickable-show"
