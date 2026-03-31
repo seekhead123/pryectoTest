@@ -1,12 +1,29 @@
-<div class="container-fluid d-flex justify-content-center align-items-center">
-  <div class="text-center">
-    
-    <button class="btn btn-primary btn-lg mx-2 mb-3 big-btn" (click)="enviarCanal('CartoonNetwork')">CartoonNetwork</button>
-    <button class="btn btn-warning btn-lg mx-2 mb-3 big-btn" (click)="enviarCanal('Nickelodeon')">Nickelodeon</button>
-    <button class="btn btn-info btn-lg mx-2 mb-3 big-btn" (click)="enviarCanal('Disney')">Disney</button>
-    <button class="btn btn-danger btn-lg mx-2 mb-3 big-btn" (click)="enviarCanal('Jetix')">Jetix</button>
-    <button class="btn btn-warning btn-lg mx-2 mb-3 big-btn" (click)="enviarCanal('Etc')">Etcetera</button>
-  </div>
-</div>
+<section class="channels-page">
+  <div class="hero-card">
+    <p class="eyebrow">Programacion retro</p>
+    <h1>Elegi un canal y desplega la tabla cuando quieras verla.</h1>
+    <p class="hero-copy">
+      Reorganicé la experiencia para que primero se elija el canal y recien despues aparezca la grilla con la programacion.
+      Tambien mejoré el estilo general para que se vea mas moderno, claro y agradable.
+    </p>
 
-<app-dibujar-api [scheduleByDay]="channelType()"></app-dibujar-api>
+    <div class="channels-grid">
+      <button
+        *ngFor="let channel of channels"
+        type="button"
+        class="channel-card"
+        [class.is-active]="channelType() === channel.id"
+        [ngClass]="channel.accent"
+        (click)="enviarCanal(channel.id)">
+        <span class="channel-name">{{ channel.name }}</span>
+        <span class="channel-description">{{ channel.description }}</span>
+      </button>
+    </div>
+
+    <div class="selection-hint" *ngIf="!channelType()">
+      Selecciona un canal para cargar la tabla.
+    </div>
+  </div>
+
+  <app-dibujar-api *ngIf="channelType()" [scheduleByDay]="channelType()"></app-dibujar-api>
+</section>

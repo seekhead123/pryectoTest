@@ -1,59 +1,51 @@
 # PryectoTest
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.2.0.
+Aplicacion Angular con grillas retro de Cartoon Network, Nickelodeon, Disney, Jetix y Etcetera.
 
-## Development server
+## Desarrollo local
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Para iniciar el entorno local:
 
 ```bash
-ng generate component component-name
+npm install
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+La app queda disponible en `http://localhost:4200/`.
+
+## Build
+
+Build de produccion:
 
 ```bash
-ng generate --help
+npm run build
 ```
 
-## Building
-
-To build the project run:
+Build listo para GitHub Pages:
 
 ```bash
-ng build
+npm run build:pages
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Ese comando:
 
-## Running unit tests
+- compila Angular con `base-href /pryectoTest/`
+- genera la salida en `dist/pryectoTest/browser`
+- crea `404.html` para soportar recarga de rutas en GitHub Pages
+- crea `.nojekyll`
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## GitHub Actions + Pages
+
+El workflow ya esta en [deploy-pages.yml](/C:/Users/daniel/pryectoTest/.github/workflows/deploy-pages.yml) y publica automaticamente al hacer push a `main`.
+
+Para activarlo en GitHub:
+
+1. Ve a `Settings > Pages`.
+2. En `Source`, selecciona `GitHub Actions`.
+3. Haz push a `main`.
+
+## Tests
 
 ```bash
-ng test
+npm test
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

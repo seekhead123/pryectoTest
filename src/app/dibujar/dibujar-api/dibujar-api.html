@@ -1,29 +1,54 @@
-<div class="schedule-container">
-  <table class="table table-bordered table-sm text-center align-middle schedule-table">
-    <thead class="table-dark">
-      <tr>
-        <th>Hora</th>
-        <th *ngFor="let day of days">{{ day }}</th>
-      </tr>
-    </thead>
-    <tbody>
- <tr *ngFor="let time of timeSlots">
-  <td [ngClass]="{'active-row': isActive(time)}">
-  <strong>{{ time }}</strong>
-  <span *ngIf="isActive(time)" class="live-badge">* emitiendo ahora</span>
-</td>
-  <td *ngFor="let day of days" [ngClass]="{'active-row': isActive(time)}">
-    <ng-container *ngIf="cartoonScheduleByDay[day][time]?.length; else noShow">
-      <span [ngClass]="{'active-row-badges': isActive(time)}" class="clickable-show"
-            *ngFor="let show of cartoonScheduleByDay[day][time]"
-            (click)="goToShow(show)">
-        {{ show }}
-      </span>
-    </ng-container>
-    <ng-template #noShow>-</ng-template>
-  </td>
-</tr>
+<section class="schedule-section" [ngClass]="getRowClass()">
+  <div class="schedule-header">
+    <div>
+      <p class="schedule-kicker">Canal seleccionado</p>
+      <h2>{{ getChannelTitle() }}</h2>
+      <p class="schedule-description">{{ getChannelDescription() }}</p>
+      <div class="year-switcher">
+        <button
+          *ngFor="let year of years"
+          type="button"
+          class="year-button"
+          [class.is-active]="selectedYear() === year"
+          (click)="selectYear(year)">
+          {{ year }}
+        </button>
+      </div>
+    </div>
+    <div class="schedule-chip">Se actualiza segun la hora actual</div>
+  </div>
 
-    </tbody>
-  </table>
-</div>
+  <div class="schedule-container">
+    <table class="schedule-table">
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th *ngFor="let day of days">{{ formatDayLabel(day) }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let time of timeSlots">
+          <td class="time-cell" [ngClass]="{ 'active-row': isActive(time) }">
+            <strong>{{ time }}</strong>
+            <span *ngIf="isActive(time)" class="live-badge">En emision</span>
+          </td>
+          <td *ngFor="let day of days" [ngClass]="{ 'active-row': isActive(time) }">
+            <ng-container *ngIf="cartoonScheduleByDay[day][time]?.length; else noShow">
+              <button
+                type="button"
+                class="clickable-show"
+                [ngClass]="{ 'active-row-badges': isActive(time) }"
+                *ngFor="let show of cartoonScheduleByDay[day][time]"
+                (click)="goToShow(show)">
+                {{ show }}
+              </button>
+            </ng-container>
+            <ng-template #noShow>
+              <span class="empty-slot">Sin emision</span>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

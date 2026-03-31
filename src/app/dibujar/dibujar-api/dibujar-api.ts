@@ -1,6 +1,8 @@
-import { AfterViewChecked, Component, effect, input, Input, OnInit } from '@angular/core';
-import { Api, User } from '../../services/api';
+import { AfterViewChecked, Component, effect, input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+type ScheduleMap = Record<string, Record<string, string[]>>;
+type ChannelYearMap = Record<string, Record<number, ScheduleMap>>;
 
 @Component({
   selector: 'app-dibujar-api',
@@ -10,22 +12,22 @@ import { CommonModule } from '@angular/common';
   styleUrl: './dibujar-api.scss'
 })
 export class DibujarApi implements OnInit,AfterViewChecked {
-    // @Input() scheduleByDay!: string ;
      scheduleByDay = input.required<string>()
-     
+  readonly years = [2006, 2007, 2008];
+  readonly selectedYear = signal<number>(2007);
+
   days: string[] = [];
   timeSlots: string[] = [];
 
-  users: User[] = [];
   cartoonScheduleByDay : any;
   jetixScheduleByDay: any;
   nickScheduleByDay : any;
   disneyScheduleByDay: any;
   etcScheduleByDay: any;
-  // scheduleByDay: Record<string, Record<string, string[]>> = {};
-selectedTime: Date = new Date();
+  channelSchedulesByYear: ChannelYearMap = {};
+  selectedTime: Date = new Date();
 
-  constructor(private _api : Api){
+  constructor(){
 this.cartoonScheduleByDay = {
   lunesJueves: {
     "00:00": ["Dragon Ball Z"],
@@ -599,30 +601,21 @@ this.etcScheduleByDay= {
   }
 };
 
-  const newCartoon = this.cartoonScheduleByDay
-effect(() => {
-  const scheduleMap: Record<string, any> = {
-    CartoonNetwork: newCartoon,
-    Jetix: this.jetixScheduleByDay,
-    Nickelodeon: this.nickScheduleByDay,
-    Disney: this.disneyScheduleByDay,
-    Etc: this.etcScheduleByDay
-  };
+  this.channelSchedulesByYear = this.createChannelSchedulesByYear();
 
-  const selectedSchedule = scheduleMap[this.scheduleByDay()];
-  if (selectedSchedule) {
-    this.setSchedule(selectedSchedule);
-  }
-});
+  effect(() => {
+    const selectedChannel = this.scheduleByDay();
+    const selectedSchedule = this.channelSchedulesByYear[selectedChannel]?.[this.selectedYear()];
+
+    if (selectedSchedule) {
+      this.setSchedule(selectedSchedule);
+    }
+  });
   }
   activeRowElement?: HTMLElement;
 
     ngOnInit(): void {
-      debugger
     setInterval(() => this.selectedTime = new Date(), 60000);
-    console.log(this.scheduleByDay())
-      this.setSchedule(this.nickScheduleByDay);
-
   }
      ngAfterViewChecked() {
     if (this.activeRowElement) {
@@ -643,12 +636,7 @@ effect(() => {
 //   }
 
 
- setSchedule(schedule: Record<string, Record<string, string[]>>) {
- 
-  if(this.scheduleByDay()==="CartoonNetwork"){
-   
-    }
-
+ setSchedule(schedule: ScheduleMap) {
     this.cartoonScheduleByDay = schedule;
 
     // Extract days
@@ -660,28 +648,18 @@ effect(() => {
       Object.keys(schedule[day]).forEach(time => allTimes.add(time));
     });
 
-    this.timeSlots = Array.from(allTimes).sort((a, b) => {
-      const toMinutes = (t: string) => {
-        const [h, m] = t.split(':').map(Number);
-        return h * 60 + m;
-      };
-      return toMinutes(a) - toMinutes(b);
-    });
+    this.timeSlots = Array.from(allTimes).sort((a, b) => this.toMinutes(a) - this.toMinutes(b));
   }
 
   
 
  isActive(time: string): boolean {
-  debugger
-
       if(parseInt(time.split(':')[0], 10) === this.selectedTime.getHours()) {
-
     return true
       }
       else{
         return false;
       }
-
   }
 
 goToShow(show: string) {
@@ -692,37 +670,527 @@ goToShow(show: string) {
   // Open in new tab
   window.open(url, '_blank');
 }
-getChannelClass(show: string): string {
-  const name = show.toLowerCase();
-  if (name.includes('cartoon')) return 'cartoonnetwork';
-  if (name.includes('jetix') || name.includes('power rangers')) return 'jetix';
-  if (name.includes('disney')) return 'disney';
-  if (name.includes('nickelodeon')) return 'nickelodeon';
-  return 'default-channel'; // fallback
-}
  setActiveRow(el: HTMLElement | null, time: string) {
     if (el && this.isActive(time)) {
       this.activeRowElement = el;
     }
   }
-// returns row class name used above
 getRowClass(): string {
   switch (this.scheduleByDay()) {
-    case 'CartoonNetwork': return 'active-row-cn';
-    case 'Jetix': return 'active-row-jetix';
-    case 'Nickelodeon': return 'active-row-nick';
-    case 'Disney': return 'active-row-disney';
-    default: return 'active-row-cn';
+    case 'CartoonNetwork': return 'theme-cartoon';
+    case 'Jetix': return 'theme-jetix';
+    case 'Nickelodeon': return 'theme-nick';
+    case 'Disney': return 'theme-disney';
+    case 'Etc': return 'theme-etc';
+    default: return 'theme-cartoon';
   }
 }
 
-getBadgeClass(): string {
+getChannelTitle(): string {
   switch (this.scheduleByDay()) {
-    case 'CartoonNetwork': return 'badge-cn';
-    case 'Jetix': return 'badge-jetix';
-    case 'Nickelodeon': return 'badge-nick';
-    case 'Disney': return 'badge-disney';
-    default: return 'badge-cn';
+    case 'CartoonNetwork': return 'Cartoon Network';
+    case 'Jetix': return 'Jetix';
+    case 'Nickelodeon': return 'Nickelodeon';
+    case 'Disney': return 'Disney Channel';
+    case 'Etc': return 'Etcetera';
+    default: return this.scheduleByDay();
   }
+}
+
+getChannelDescription(): string {
+  switch (this.scheduleByDay()) {
+    case 'CartoonNetwork': return `Grilla ${this.selectedYear()} con clasicos, accion y bloques animados.`;
+    case 'Jetix': return `Programacion ${this.selectedYear()} con aventura, anime y heroes.`;
+    case 'Nickelodeon': return `Seleccion ${this.selectedYear()} con series, humor y nostalgia.`;
+    case 'Disney': return `Parrilla ${this.selectedYear()} con series juveniles y animacion.`;
+    case 'Etc': return `Archivo ${this.selectedYear()} con anime, cultura pop y maratones retro.`;
+    default: return 'Consulta la programacion del canal seleccionado.';
+  }
+}
+
+formatDayLabel(day: string): string {
+  const labels: Record<string, string> = {
+    lunesJueves: 'Lunes a jueves',
+    viernesDomingo: 'Viernes a domingo',
+    lunesViernes: 'Lunes a viernes',
+    sabadoDomingo: 'Sabado y domingo',
+    viernes: 'Viernes',
+    sabado: 'Sabado'
+  };
+
+  return labels[day] ?? day;
+}
+
+selectYear(year: number) {
+  this.selectedYear.set(year);
+}
+
+private createChannelSchedulesByYear(): ChannelYearMap {
+  const cartoon2007 = this.normalizeSchedule(this.cartoonScheduleByDay);
+  const jetix2007 = this.normalizeSchedule(this.jetixScheduleByDay);
+  const nick2007 = this.normalizeSchedule(this.nickScheduleByDay);
+  const disney2007 = this.normalizeSchedule(this.disneyScheduleByDay);
+  const etc2007 = this.normalizeSchedule(this.etcScheduleByDay);
+
+  return {
+    CartoonNetwork: {
+      2006: this.buildCartoon2006(cartoon2007),
+      2007: cartoon2007,
+      2008: this.buildCartoon2008(cartoon2007)
+    },
+    Jetix: {
+      2006: this.buildJetix2006(jetix2007),
+      2007: jetix2007,
+      2008: this.buildJetix2008(jetix2007)
+    },
+    Nickelodeon: {
+      2006: this.buildNick2006(nick2007),
+      2007: nick2007,
+      2008: this.buildNick2008(nick2007)
+    },
+    Disney: {
+      2006: this.buildDisney2006(disney2007),
+      2007: disney2007,
+      2008: this.buildDisney2008(disney2007)
+    },
+    Etc: {
+      2006: this.buildEtc2006(etc2007),
+      2007: etc2007,
+      2008: this.buildEtc2008(etc2007)
+    }
+  };
+}
+
+private normalizeSchedule(schedule: ScheduleMap): ScheduleMap {
+  const dayOrder = ['lunesJueves', 'lunesViernes', 'viernes', 'viernesDomingo', 'sabado', 'sabadoDomingo'];
+  const sortedDays = Object.keys(schedule).sort((a, b) => {
+    const indexA = dayOrder.indexOf(a);
+    const indexB = dayOrder.indexOf(b);
+
+    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
+  return Object.fromEntries(
+    sortedDays.map((day) => {
+      const sortedTimes = Object.keys(schedule[day]).sort((a, b) => this.toMinutes(a) - this.toMinutes(b));
+
+      return [
+        day,
+        Object.fromEntries(
+          sortedTimes.map((time) => [
+            time,
+            [...new Set(schedule[day][time])]
+              .filter(Boolean)
+              .sort((firstShow, secondShow) => firstShow.localeCompare(secondShow))
+          ])
+        )
+      ];
+    })
+  );
+}
+
+private toMinutes(time: string): number {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+private applyOverrides(baseSchedule: ScheduleMap, overrides: Partial<ScheduleMap>): ScheduleMap {
+  const cloned = structuredClone(baseSchedule) as ScheduleMap;
+
+  Object.entries(overrides).forEach(([day, dayOverrides]) => {
+    if (!dayOverrides) {
+      return;
+    }
+
+    cloned[day] = {
+      ...(cloned[day] ?? {}),
+      ...dayOverrides
+    };
+  });
+
+  return this.normalizeSchedule(cloned);
+}
+
+private buildCartoon2006(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesJueves: {
+      '06:00': ['Las chicas superpoderosas'],
+      '06:30': ['Tom y Jerry'],
+      '07:00': ['Mansión Foster para amigos imaginarios'],
+      '07:30': ['Mansión Foster para amigos imaginarios'],
+      '08:00': ['Cartoon Cartoons'],
+      '08:30': ['¿Qué hay de nuevo, Scooby-Doo?'],
+      '09:00': ['Hi Hi Puffy AmiYumi'],
+      '09:30': ['Las chicas superpoderosas Z'],
+      '10:00': ['KND: Los chicos del barrio'],
+      '10:30': ['Ed, Edd y Eddy'],
+      '11:00': ['Ben 10'],
+      '11:30': ['Mi compañero de clase es un mono'],
+      '12:00': ['Las sombrías aventuras de Billy y Mandy'],
+      '12:30': ['Vida y obra de Juniper Lee'],
+      '13:00': ['Los jóvenes titanes'],
+      '13:30': ['Duelo Xiaolin'],
+      '14:00': ['Campamento Lazlo'],
+      '14:30': ['Robotboy'],
+      '15:00': ['Pokémon: Batalla avanzada'],
+      '15:30': ['Ben 10'],
+      '16:00': ['Ed, Edd y Eddy'],
+      '16:30': ['KND: Los chicos del barrio']
+    },
+    viernesDomingo: {
+      '06:00': ['Tom y Jerry'],
+      '06:30': ['Las chicas superpoderosas'],
+      '07:00': ['Mansión Foster para amigos imaginarios'],
+      '07:30': ['Campamento Lazlo'],
+      '08:00': ['¿Qué hay de nuevo, Scooby-Doo?'],
+      '08:30': ['Las sombrías aventuras de Billy y Mandy'],
+      '09:00': ['Cartoon Pop'],
+      '09:30': ['Las aventuras de Tom y Jerry'],
+      '10:00': ['KND: Los chicos del barrio'],
+      '10:30': ['Mansión Foster para amigos imaginarios'],
+      '11:00': ['Las chicas superpoderosas'],
+      '11:30': ['Ed, Edd y Eddy'],
+      '12:00': ['Ben 10'],
+      '12:30': ['Campamento Lazlo'],
+      '13:00': ['Los jóvenes titanes'],
+      '13:30': ['Duelo Xiaolin'],
+      '14:00': ['Pokémon'],
+      '14:30': ['Robotboy']
+    }
+  });
+}
+
+private buildCartoon2008(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesJueves: {
+      '06:00': ['Dragon Ball'],
+      '06:30': ['Naruto'],
+      '07:00': ['Ben 10'],
+      '07:30': ['Las aventuras de Tom y Jerry'],
+      '08:00': ['¿Qué hay de nuevo, Scooby-Doo?'],
+      '08:30': ['Las sombrías aventuras de Billy y Mandy'],
+      '09:00': ['Cartoon Pop'],
+      '09:30': ['Las aventuras de Tom y Jerry'],
+      '10:00': ['Campamento Lazlo'],
+      '10:30': ['KND: Los chicos del barrio'],
+      '11:00': ['Las chicas superpoderosas'],
+      '11:30': ['Ed, Edd y Eddy'],
+      '12:00': ['Dragon Ball Z'],
+      '12:30': ['Las sombrías aventuras de Billy y Mandy'],
+      '13:00': ['Dragon Ball'],
+      '13:30': ['Dragon Ball Z'],
+      '14:00': ['Naruto'],
+      '14:30': ['Ben 10'],
+      '15:00': ['Pokémon'],
+      '15:30': ['Ed, Edd y Eddy'],
+      '16:00': ['¿Qué hay de nuevo, Scooby-Doo?'],
+      '16:30': ['Las aventuras de Tom y Jerry'],
+      '17:00': ['Cinemanía'],
+      '17:30': ['Robotboy'],
+      '18:00': ['Teatro Cartoon'],
+      '18:30': ['Mi compañero de clase es un mono']
+    },
+    viernesDomingo: {
+      '06:00': ['Tom y Jerry'],
+      '06:30': ['Las chicas superpoderosas'],
+      '07:00': ['Cuatro ojos'],
+      '07:30': ['Mansión Foster para amigos imaginarios'],
+      '08:00': ['Campamento Lazlo'],
+      '08:30': ['¿Qué hay de nuevo, Scooby-Doo?'],
+      '09:00': ['Las sombrías aventuras de Billy y Mandy'],
+      '10:00': ['Mini-maratones'],
+      '11:00': ['Johnny Test'],
+      '11:30': ['Las sombrías aventuras de Billy y Mandy'],
+      '12:30': ['Naruto'],
+      '13:00': ['Legión de superhéroes'],
+      '13:30': ['Ben 10'],
+      '14:00': ['Storm Hawks'],
+      '14:30': ['Pokémon'],
+      '15:00': ['Mini-maratones'],
+      '16:00': ['Pokémon'],
+      '16:30': ['Ben 10']
+    }
+  });
+}
+
+private buildJetix2006(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesViernes: {
+      '06:00': ['Kirby'],
+      '06:30': ['Transformers Cybertron'],
+      '07:00': ['Battle B-Daman'],
+      '07:30': ['Digimon'],
+      '08:00': ['Power Rangers Tormenta Ninja'],
+      '08:30': ['Power Rangers Dino Trueno'],
+      '09:00': ['El Pájaro Loco'],
+      '09:30': ['Teamo Supremo'],
+      '10:00': ['Las Tortugas Ninja'],
+      '10:30': ['Dave, el Bárbaro'],
+      '11:00': ['Tres Espías Sin Límite'],
+      '11:30': ['W.I.T.C.H.'],
+      '12:00': ['Dragon Booster'],
+      '12:30': ['Code Lyoko'],
+      '14:00': ['Generación Power Rangers'],
+      '15:00': ['Sonic X'],
+      '15:30': ['Code Lyoko'],
+      '16:00': ['Power Rangers Fuerza Salvaje'],
+      '16:30': ['Power Rangers Tormenta Ninja'],
+      '17:00': ['Power Rangers Dino Trueno'],
+      '17:30': ['Pucca'],
+      '18:00': ['Dave, el Bárbaro'],
+      '18:30': ['Space Goofs']
+    },
+    viernes: {
+      '21:30': ['Get Ed'],
+      '22:00': ['Súper Escuadrón Ciber Monos Hiperfuerza ¡Ya!'],
+      '22:30': ['Los Padrinos Mágicos'],
+      '23:00': ['Los Padrinos Mágicos']
+    },
+    sabado: {
+      '06:00': ['Kirby'],
+      '06:30': ['Transformers Cybertron'],
+      '07:00': ['ATOM'],
+      '07:30': ['Battle B-Daman'],
+      '08:00': ['Power Rangers Tormenta Ninja'],
+      '08:30': ['Power Rangers Dino Trueno'],
+      '09:00': ['Power Rangers S.P.D.'],
+      '09:30': ['Dave, el Bárbaro'],
+      '10:00': ['Los Padrinos Mágicos'],
+      '10:30': ['Shuriken School'],
+      '15:00': ['Doble Carga: Shuriken School'],
+      '16:00': ['Los Padrinos Mágicos'],
+      '16:30': ['Pucca'],
+      '17:00': ['Power Rangers Fuerza Salvaje'],
+      '17:30': ['Power Rangers S.P.D.']
+    }
+  });
+}
+
+private buildJetix2008(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesViernes: {
+      '06:00': ['Dino Rey'],
+      '06:30': ['Isla de Mutantes'],
+      '07:00': ['Pucca'],
+      '07:30': ['Los Padrinos Mágicos'],
+      '08:00': ['Combo Niños'],
+      '08:30': ['Combo Niños'],
+      '09:00': ['Animaniacs'],
+      '09:30': ['Animaniacs'],
+      '10:00': ['Rocket y Groot'],
+      '10:30': ['Rocket y Groot'],
+      '11:00': ['Mi Familia Mágica'],
+      '11:30': ['Mi Familia Mágica'],
+      '12:00': ['El Pájaro Loco'],
+      '12:30': ['El Pájaro Loco'],
+      '13:00': ['PINY: Instituto de Nueva York'],
+      '13:30': ['PINY: Instituto de Nueva York'],
+      '14:00': ['El Show Secreto'],
+      '14:30': ['El Show Secreto'],
+      '15:00': ['Gargoyles'],
+      '15:30': ['Gargoyles'],
+      '16:00': ['George de la Selva'],
+      '16:30': ['George de la Selva'],
+      '17:00': ['Los Padrinos Mágicos'],
+      '17:30': ['Los Padrinos Mágicos'],
+      '18:00': ['Yin Yang Yo!'],
+      '18:30': ['Yin Yang Yo!'],
+      '19:00': ['Grotescología'],
+      '19:30': ['Grotescología']
+    }
+  });
+}
+
+private buildNick2006(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesViernes: {
+      '10:00': ['Pequeño Bill'],
+      '10:30': ['Las Pistas de Blue'],
+      '12:30': ['Oye Arnold'],
+      '13:00': ['Bob Esponja'],
+      '13:30': ['Las Aventuras de Jimmy Neutrón: El Niño Genio'],
+      '14:00': ['Martin Mystery'],
+      '15:30': ['31 Minutos'],
+      '16:00': ['Trollz'],
+      '17:00': ['Los Rugrats Crecidos'],
+      '18:00': ['Las Aventuras de Jimmy Neutrón: El Niño Genio'],
+      '18:30': ['Catscratch'],
+      '19:00': ['Kappa Mikey'],
+      '19:30': ['Yu-Gi-Oh'],
+      '20:00': ['Yu-Gi-Oh GX'],
+      '20:30': ['Drake & Josh'],
+      '21:00': ['Zoey 101'],
+      '21:30': ['Todo por pasión']
+    },
+    sabadoDomingo: {
+      '07:00': ['Zona Tiza'],
+      '07:30': ['Ginger'],
+      '08:00': ['Trollz'],
+      '08:30': ['La robot adolescente'],
+      '09:00': ['Los Rugrats Crecidos'],
+      '09:30': ['Bob Esponja'],
+      '10:00': ['Los Padrinos Mágicos'],
+      '10:30': ['Catscratch'],
+      '11:00': ['Los X'],
+      '11:30': ['Skimo'],
+      '12:00': ['Manual de supervivencia escolar de Ned'],
+      '12:30': ['Danny Phantom']
+    }
+  });
+}
+
+private buildNick2008(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesViernes: {
+      '20:00': ['Manual de supervivencia escolar de Ned'],
+      '20:30': ['iCarly'],
+      '21:00': ['Drake & Josh'],
+      '21:30': ['Zoey 101'],
+      '22:00': ['Alf'],
+      '22:30': ['Mork y Mindy'],
+      '23:00': ['Los Locos Addams'],
+      '23:30': ['Los Munsters'],
+      '00:00': ['Hechizada'],
+      '00:30': ['Mi bella genio'],
+      '01:00': ['¡Ay! como duele crecer'],
+      '01:30': ['Los Munsters'],
+      '02:00': ['Alf'],
+      '02:30': ['Mork y Mindy'],
+      '03:00': ['Los Locos Addams'],
+      '03:30': ['Los Munsters']
+    },
+    sabadoDomingo: {
+      '20:30': ['Avatar: La leyenda de Aang'],
+      '21:00': ['Danny Phantom'],
+      '21:30': ['Bob Esponja'],
+      '22:00': ['Alf'],
+      '22:30': ['Blanco y Negro'],
+      '23:00': ['Los Hechos de la Vida'],
+      '23:30': ['¡Ay! como duele crecer']
+    }
+  });
+}
+
+private buildDisney2006(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesJueves: {
+      '06:00': ['Stanley'],
+      '06:30': ['JoJo\'s Circus'],
+      '07:00': ['Rolie Polie Olie'],
+      '07:30': ['Higglytown Heroes'],
+      '08:00': ['La casa de Mickey Mouse'],
+      '08:30': ['Mini Einsteins'],
+      '09:00': ['Phil del Futuro'],
+      '09:30': ['Kim Possible'],
+      '10:00': ['La familia Proud'],
+      '10:30': ['Sister, Sister'],
+      '11:00': ['Boy Meets World'],
+      '11:30': ['La vida con Zack y Cody'],
+      '12:00': ['Life with Derek'],
+      '12:30': ['Brandy y Mr. Whiskers'],
+      '13:00': ['Lilo & Stitch: La serie'],
+      '13:30': ['American Dragon: Jake Long'],
+      '14:00': ['Phil del Futuro'],
+      '14:30': ['Kim Possible'],
+      '15:00': ['La familia Proud'],
+      '15:30': ['Sister, Sister'],
+      '16:00': ['Boy Meets World'],
+      '16:30': ['La vida con Zack y Cody']
+    }
+  });
+}
+
+private buildDisney2008(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesJueves: {
+      '06:00': ['La casa de Mickey Mouse'],
+      '06:30': ['Mis amigos Tigger y Pooh'],
+      '07:00': ['Mini Einsteins'],
+      '07:30': ['Manny a la obra'],
+      '08:00': ['Hannah Montana'],
+      '08:30': ['La vida con Zack y Cody'],
+      '09:00': ['Eso es Raven'],
+      '09:30': ['Cory en la Casa Blanca'],
+      '10:00': ['Kim Possible'],
+      '10:30': ['Phineas y Ferb'],
+      '11:00': ['Lilo & Stitch: La serie'],
+      '11:30': ['Brandy y Mr. Whiskers'],
+      '12:00': ['Art Attack'],
+      '12:30': ['American Dragon: Jake Long'],
+      '13:00': ['Hannah Montana'],
+      '13:30': ['La vida con Zack y Cody'],
+      '14:00': ['Eso es Raven'],
+      '14:30': ['Cory en la Casa Blanca'],
+      '15:00': ['Kim Possible'],
+      '15:30': ['Los Sustitutos'],
+      '16:00': ['Phineas y Ferb'],
+      '16:30': ['Yin Yang Yo!']
+    },
+    viernesDomingo: {
+      '00:00': ['Hannah Montana'],
+      '00:30': ['La vida con Zack y Cody'],
+      '01:00': ['Eso es Raven'],
+      '01:30': ['Cory en la Casa Blanca'],
+      '06:00': ['La casa de Mickey Mouse'],
+      '06:30': ['Mis amigos Tigger y Pooh'],
+      '07:00': ['Mini Einsteins'],
+      '07:30': ['Manny a la obra'],
+      '08:00': ['Hannah Montana'],
+      '08:30': ['La vida con Zack y Cody'],
+      '09:00': ['Eso es Raven'],
+      '09:30': ['Cory en la Casa Blanca']
+    }
+  });
+}
+
+private buildEtc2006(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesViernes: {
+      '00:00': ['Ranma 1/2'],
+      '00:30': ['Ranma 1/2'],
+      '01:00': ['Naruto'],
+      '01:30': ['Naruto'],
+      '02:00': ['Slam Dunk'],
+      '02:30': ['Slam Dunk'],
+      '06:00': ['Doraemon'],
+      '06:30': ['Doraemon'],
+      '07:00': ['Supercampeones'],
+      '07:30': ['Supercampeones'],
+      '08:00': ['Zenki'],
+      '08:30': ['Zenki']
+    }
+  });
+}
+
+private buildEtc2008(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesViernes: {
+      '00:00': ['Dragon Ball Z'],
+      '00:30': ['Dragon Ball Z'],
+      '01:00': ['Naruto'],
+      '01:30': ['Naruto'],
+      '02:00': ['Bleach'],
+      '02:30': ['Bleach'],
+      '03:00': ['Death Note'],
+      '03:30': ['Death Note'],
+      '04:00': ['Saint Seiya'],
+      '04:30': ['Saint Seiya'],
+      '05:00': ['Sailor Moon'],
+      '05:30': ['Sailor Moon']
+    },
+    sabadoDomingo: {
+      '20:00': ['Dragon Ball Z'],
+      '20:30': ['Dragon Ball Z'],
+      '21:00': ['Naruto'],
+      '21:30': ['Naruto'],
+      '22:00': ['Bleach'],
+      '22:30': ['Bleach'],
+      '23:00': ['Death Note'],
+      '23:30': ['Death Note']
+    }
+  });
 }
 }

@@ -1,1 +1,38 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  color-scheme: light;
+  --page-bg:
+    radial-gradient(circle at top left, rgba(255, 206, 112, 0.35), transparent 28%),
+    radial-gradient(circle at top right, rgba(128, 197, 255, 0.28), transparent 24%),
+    linear-gradient(135deg, #fff7ef 0%, #f4f7ff 52%, #eef7f5 100%);
+  --panel-bg: rgba(255, 255, 255, 0.74);
+  --panel-border: rgba(33, 53, 85, 0.09);
+  --text-main: #1d2a44;
+  --text-soft: #5e6a84;
+  --shadow-lg: 0 24px 70px rgba(29, 42, 68, 0.14);
+  --shadow-md: 0 10px 30px rgba(29, 42, 68, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--page-bg);
+  color: var(--text-main);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
