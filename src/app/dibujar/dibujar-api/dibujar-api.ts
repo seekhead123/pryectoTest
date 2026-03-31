@@ -750,7 +750,7 @@ private createChannelSchedulesByYear(): ChannelYearMap {
     },
     Disney: {
       2006: this.buildDisney2006(disney2007),
-      2007: disney2007,
+      2007: this.buildDisney2007(disney2007),
       2008: this.buildDisney2008(disney2007)
     },
     Etc: {
@@ -1077,28 +1077,102 @@ private buildNick2008(base: ScheduleMap): ScheduleMap {
 private buildDisney2006(base: ScheduleMap): ScheduleMap {
   return this.applyOverrides(base, {
     lunesJueves: {
-      '06:00': ['Stanley'],
+      '06:00': ['Mini Einsteins'],
       '06:30': ['JoJo\'s Circus'],
       '07:00': ['Rolie Polie Olie'],
       '07:30': ['Higglytown Heroes'],
-      '08:00': ['La casa de Mickey Mouse'],
-      '08:30': ['Mini Einsteins'],
+      '08:00': ['Stanley'],
+      '08:30': ['La casa de Mickey Mouse'],
       '09:00': ['Phil del Futuro'],
       '09:30': ['Kim Possible'],
       '10:00': ['La familia Proud'],
       '10:30': ['Sister, Sister'],
       '11:00': ['Boy Meets World'],
       '11:30': ['La vida con Zack y Cody'],
-      '12:00': ['Life with Derek'],
-      '12:30': ['Brandy y Mr. Whiskers'],
-      '13:00': ['Lilo & Stitch: La serie'],
-      '13:30': ['American Dragon: Jake Long'],
+      '12:00': ['Brandy y Mr. Whiskers'],
+      '12:30': ['Lilo & Stitch: La serie'],
+      '13:00': ['American Dragon: Jake Long'],
+      '13:30': ['Eso es Raven'],
       '14:00': ['Phil del Futuro'],
       '14:30': ['Kim Possible'],
       '15:00': ['La familia Proud'],
-      '15:30': ['Sister, Sister'],
-      '16:00': ['Boy Meets World'],
-      '16:30': ['La vida con Zack y Cody']
+      '15:30': ['La vida con Zack y Cody'],
+      '16:00': ['Brandy y Mr. Whiskers'],
+      '16:30': ['Lilo & Stitch: La serie'],
+      '17:00': ['American Dragon: Jake Long'],
+      '17:30': ['Art Attack']
+    },
+    viernesDomingo: {
+      '06:00': ['Mini Einsteins'],
+      '06:30': ['JoJo\'s Circus'],
+      '07:00': ['Rolie Polie Olie'],
+      '07:30': ['Higglytown Heroes'],
+      '08:00': ['Stanley'],
+      '08:30': ['La casa de Mickey Mouse'],
+      '09:00': ['Phil del Futuro'],
+      '09:30': ['Kim Possible'],
+      '10:00': ['La familia Proud'],
+      '10:30': ['La vida con Zack y Cody'],
+      '11:00': ['Eso es Raven'],
+      '11:30': ['Lilo & Stitch: La serie'],
+      '12:00': ['Art Attack'],
+      '12:30': ['Película Disney'],
+      '14:00': ['American Dragon: Jake Long'],
+      '14:30': ['Kim Possible']
+    }
+  });
+}
+
+private buildDisney2007(base: ScheduleMap): ScheduleMap {
+  return this.applyOverrides(base, {
+    lunesJueves: {
+      '06:00': ['Manny a la obra'],
+      '06:30': ['La casa de Mickey Mouse'],
+      '07:00': ['Mini Einsteins'],
+      '07:30': ['Mis amigos Tigger y Pooh'],
+      '08:00': ['Hannah Montana'],
+      '08:30': ['La vida con Zack y Cody'],
+      '09:00': ['Eso es Raven'],
+      '09:30': ['Phil del Futuro'],
+      '10:00': ['Kim Possible'],
+      '10:30': ['La familia Proud'],
+      '11:00': ['American Dragon: Jake Long'],
+      '11:30': ['Brandy y Mr. Whiskers'],
+      '12:00': ['Lilo & Stitch: La serie'],
+      '12:30': ['Art Attack'],
+      '13:00': ['Hannah Montana'],
+      '13:30': ['La vida con Zack y Cody'],
+      '14:00': ['Eso es Raven'],
+      '14:30': ['Cory en la Casa Blanca'],
+      '15:00': ['Kim Possible'],
+      '15:30': ['American Dragon: Jake Long'],
+      '16:00': ['Lilo & Stitch: La serie'],
+      '16:30': ['Yin Yang Yo!'],
+      '17:00': ['Jump In!'],
+      '17:30': ['High School Musical']
+    },
+    viernesDomingo: {
+      '00:00': ['Hannah Montana'],
+      '00:30': ['La vida con Zack y Cody'],
+      '01:00': ['Eso es Raven'],
+      '01:30': ['American Dragon: Jake Long'],
+      '06:00': ['Manny a la obra'],
+      '06:30': ['La casa de Mickey Mouse'],
+      '07:00': ['Mini Einsteins'],
+      '07:30': ['Mis amigos Tigger y Pooh'],
+      '08:00': ['Hannah Montana'],
+      '08:30': ['La vida con Zack y Cody'],
+      '09:00': ['Eso es Raven'],
+      '09:30': ['Cory en la Casa Blanca'],
+      '10:00': ['Art Attack'],
+      '10:30': ['Kim Possible'],
+      '11:00': ['Película Disney'],
+      '13:00': ['Lilo & Stitch: La serie'],
+      '13:30': ['Yin Yang Yo!'],
+      '14:00': ['Hannah Montana'],
+      '14:30': ['La vida con Zack y Cody'],
+      '15:00': ['High School Musical'],
+      '15:30': ['The Cheetah Girls']
     }
   });
 }
@@ -1106,42 +1180,51 @@ private buildDisney2006(base: ScheduleMap): ScheduleMap {
 private buildDisney2008(base: ScheduleMap): ScheduleMap {
   return this.applyOverrides(base, {
     lunesJueves: {
-      '06:00': ['La casa de Mickey Mouse'],
-      '06:30': ['Mis amigos Tigger y Pooh'],
-      '07:00': ['Mini Einsteins'],
-      '07:30': ['Manny a la obra'],
+      '06:00': ['Playhouse Disney'],
+      '06:30': ['Playhouse Disney'],
+      '07:00': ['La casa de Mickey Mouse'],
+      '07:30': ['Mis amigos Tigger y Pooh'],
       '08:00': ['Hannah Montana'],
       '08:30': ['La vida con Zack y Cody'],
       '09:00': ['Eso es Raven'],
       '09:30': ['Cory en la Casa Blanca'],
       '10:00': ['Kim Possible'],
-      '10:30': ['Phineas y Ferb'],
-      '11:00': ['Lilo & Stitch: La serie'],
-      '11:30': ['Brandy y Mr. Whiskers'],
+      '10:30': ['Los sustitutos'],
+      '11:00': ['Phineas y Ferb'],
+      '11:30': ['Lilo & Stitch: La serie'],
       '12:00': ['Art Attack'],
       '12:30': ['American Dragon: Jake Long'],
       '13:00': ['Hannah Montana'],
       '13:30': ['La vida con Zack y Cody'],
       '14:00': ['Eso es Raven'],
       '14:30': ['Cory en la Casa Blanca'],
-      '15:00': ['Kim Possible'],
-      '15:30': ['Los Sustitutos'],
+      '15:00': ['Art Attack'],
+      '15:30': ['Los sustitutos'],
       '16:00': ['Phineas y Ferb'],
-      '16:30': ['Yin Yang Yo!']
+      '16:30': ['Yin Yang Yo!'],
+      '17:00': ['Hannah Montana'],
+      '17:30': ['Zack y Cody: Gemelos a bordo']
     },
     viernesDomingo: {
       '00:00': ['Hannah Montana'],
       '00:30': ['La vida con Zack y Cody'],
       '01:00': ['Eso es Raven'],
       '01:30': ['Cory en la Casa Blanca'],
-      '06:00': ['La casa de Mickey Mouse'],
-      '06:30': ['Mis amigos Tigger y Pooh'],
-      '07:00': ['Mini Einsteins'],
-      '07:30': ['Manny a la obra'],
+      '06:00': ['Playhouse Disney'],
+      '06:30': ['Playhouse Disney'],
+      '07:00': ['La casa de Mickey Mouse'],
+      '07:30': ['Mis amigos Tigger y Pooh'],
       '08:00': ['Hannah Montana'],
       '08:30': ['La vida con Zack y Cody'],
       '09:00': ['Eso es Raven'],
-      '09:30': ['Cory en la Casa Blanca']
+      '09:30': ['Cory en la Casa Blanca'],
+      '10:00': ['Art Attack'],
+      '10:30': ['Los sustitutos'],
+      '11:00': ['El maravilloso mundo de Disney'],
+      '13:00': ['Hannah Montana'],
+      '13:30': ['Camp Rock'],
+      '14:00': ['High School Musical 2'],
+      '14:30': ['Jonas Brothers en concierto en México']
     }
   });
 }
